@@ -15,6 +15,7 @@ const SidebarUTP = () => {
       <nav>
         <ul className="sidebar-nav">
           <li><Link to="/utp/home">Inicio</Link></li>
+          <li><Link to="/utp/courses">Cursos y Asignaturas</Link></li>
           <li><Link to="/utp/teachers">Docentes</Link></li>
           <li><Link to="/utp/students">Estudiantes</Link></li>
           <li><Link to="/configuracion">Configuración</Link></li>

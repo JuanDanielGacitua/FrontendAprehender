@@ -25,6 +25,7 @@ import PreviewStudent from "../pages/PreviewStudent/PreviewStudent";
 import UTPHome from "../pages/UTP/Home";
 import UTPTeachers from "../pages/UTP/Teachers";
 import UTPStudents from "../pages/UTP/Students";
+import UTPCoursesSubjects from "../pages/UTP/CoursesSubjects";
 
 // Import de páginas SuperAdmin
 import RegisterUTP from "../pages/SuperAdmin/RegisterUTP";
@@ -61,6 +62,7 @@ const AppRoutes = () => {
         <Route path="/utp" element={<UTPLayout />}>
           <Route element={<PrivateRouteByRole allowedRoles={["UTP"]} />} >
             <Route path="home" element={<UTPHome />} />
+            <Route path="courses-subjects" element={<UTPCoursesSubjects />} />
             <Route path="teachers" element={<UTPTeachers />} />
             <Route path="students" element={<UTPStudents />} />
             <Route path="configuracion" element={<Settings />} />
