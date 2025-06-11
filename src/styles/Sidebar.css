@@ -1,0 +1,82 @@
+.sidebar {
+    width: 180px;
+    background-color: #263545;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 1rem 0;
+}
+
+/* Logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.logo {
+    max-width: 60px;
+    height: auto;
+}
+
+/* Envoltorio del menú */
+.nav-wrapper {
+    flex-grow: 1;
+    /* Ocupa el espacio disponible */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Menú de navegación */
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sidebar-nav li {
+    margin: 0.3rem 0;
+    padding: 0.2rem 0.6rem;
+}
+  
+.sidebar-nav a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-nav a:hover {
+    background-color: #34516a;
+    color: #86c5ff;
+}
+
+/* Botón cerrar sesión */
+.logout-container {
+    padding: 1rem;
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 0.6rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+}

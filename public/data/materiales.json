@@ -1,0 +1,15 @@
+[
+    {
+      "id": 1,
+      "titulo": "Comparar números menores a 10",
+      "tipo": "PDF",
+      "contenido": "/recursos/matematicas-comparar-menores-10.pdf"
+    },
+    {
+      "id": 2,
+      "titulo": "Actividades de Temporalidad",
+      "tipo": "PDF",
+      "contenido": "/recursos/matematicas-temporalidad.pdf"
+    }
+  ]
+  

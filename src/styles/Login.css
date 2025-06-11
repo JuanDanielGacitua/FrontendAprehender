@@ -1,0 +1,111 @@
+/* Fondo azul oscuro */
+body,
+html {
+    height: 100%;
+    margin: 0;
+    background-color: #004080;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Contenedor principal centrado */
+.login-wrapper {
+    width: 800px;
+    max-width: 95%;
+    display: flex;
+    margin: 5% auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Lado izquierdo con imagen decorativa */
+.login-left {
+    width: 40%;
+    background-color: #004080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+/* Lado derecho del formulario */
+.login-right {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    /* Cambiar de center a flex-start */
+    justify-content: center;
+    background-color: #fff;
+    padding-top: 2rem;
+    /* Añade solo espacio arriba */
+}
+
+/* Formulario */
+.login-form {
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Logo centrado y más grande */
+.login-form .logo {
+    width: 140px;
+    max-width: none !important;
+    height: auto;
+    display: block;
+    margin: 0 auto 0.8rem auto;
+}
+
+/* Título */
+.login-form h2 {
+    margin: 0.2rem 0 0.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #003366;
+    text-align: center;
+}
+
+/* Campos */
+.login-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* Botón */
+.login-form button {
+    width: 100%;
+    background-color: #004080;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+    background-color: #0066cc;
+}
+
+/* Error */
+.login-error {
+    color: red;
+    font-size: 0.9rem;
+    text-align: center;
+}

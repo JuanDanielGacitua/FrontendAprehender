@@ -1,0 +1,16 @@
+[
+  {
+    "id": "eva-001",
+    "title": "Comparar Números - Nivel Básico",
+    "instructions": "Marca la alternativa con más elementos.",
+    "courseId": "curso-primero-basico",
+    "questions": [
+      {
+        "enunciado": "¿Cuál conjunto tiene más elementos?",
+        "opciones": ["☀️☀️", "☀️☀️☀️", "☀️"],
+        "respuestaCorrecta": 2
+      }
+    ],
+    "createdAt": "2025-05-15T20:00:00.000Z"
+  }
+]

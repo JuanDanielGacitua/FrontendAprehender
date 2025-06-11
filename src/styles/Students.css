@@ -1,0 +1,23 @@
+.tabla-estudiantes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabla-estudiantes th,
+.tabla-estudiantes td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /* lo hace circular */
+    object-fit: cover;
+    /* recorta bien si no es cuadrada */
+    border: 2px solid #ccc;
+    /* borde suave */
+}

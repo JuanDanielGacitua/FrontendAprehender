@@ -1,0 +1,12 @@
+{
+    "asistenciaPorCurso": [
+      { "curso": "Curso 1", "porcentaje": 85 },
+      { "curso": "Curso 2", "porcentaje": 74 },
+      { "curso": "Curso 3", "porcentaje": 89 }
+    ],
+    "resumenCursos": [
+      { "nombre": "Curso 1", "estudiantes": 20 },
+      { "nombre": "Curso 2", "estudiantes": 18 },
+      { "nombre": "Curso 3", "estudiantes": 22 }
+    ]
+  }

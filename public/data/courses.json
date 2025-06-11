@@ -1,0 +1,16 @@
+[
+  {
+    "id": "curso1",
+    "subject": "Lenguaje",
+    "grade": "Primero Básico",
+    "teacherId": "teacher1",
+    "createdAt": "2025-05-01T10:00:00Z"
+  },
+  {
+    "id": "curso2",
+    "subject": "Matemáticas",
+    "grade": "Segundo Básico",
+    "teacherId": "teacher2",
+    "createdAt": "2025-05-01T10:00:00Z"
+  }
+]

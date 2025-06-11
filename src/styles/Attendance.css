@@ -1,0 +1,20 @@
+.tabla-asistencias {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tabla-asistencias th,
+.tabla-asistencias td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.tabla-asistencias th {
+    background-color: #34495e;
+    color: white;
+}

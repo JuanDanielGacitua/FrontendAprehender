@@ -1,0 +1,20 @@
+/* src/App.css */
+
+h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.students-page,
+.attendance-page,
+.reports-page,
+.settings-page {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+}

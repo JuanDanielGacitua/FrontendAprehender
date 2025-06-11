@@ -1,0 +1,220 @@
+/* src/styles/UTP/Students.css */
+
+/* ==============================
+   Contenedor general de la página
+   ============================== */
+.students-page {
+    padding: 2rem;
+    background-color: #f5f5f5;
+    max-width: 1200px;
+    margin: auto;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==============================
+     Formulario de creación
+     ============================== */
+.formulario-container {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 60%;
+    min-width: 400px;
+    max-width: 700px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.formulario-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    /* Espacio entre campos */
+    color: #263545 !important;
+}
+
+.toggle-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.toggle-button img {
+    width: 35px;
+    height: 35px;
+}
+
+.formulario-campos h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.8rem;
+    color: #263545 !important;
+    font-weight: bold;
+    text-align: center;
+}
+
+.formulario-campos label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    color: #263545 !important;
+    font-weight: bold;
+}
+
+.formulario-campos input[type="text"],
+.formulario-campos input[type="number"],
+.formulario-campos input[type="password"],
+.formulario-campos select {
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid #263545 !important;
+    width: 90%;
+    max-width: 400px;
+    /* No pegarse al logo */
+    box-sizing: border-box;
+    color: #263545 !important;
+    background-color: #ffffff !important;
+    margin-bottom: 0.5rem;
+}
+
+.formulario-campos input:focus,
+.formulario-campos select:focus {
+    border-color: #2c7be5 !important;
+    outline: none;
+    box-shadow: 0 0 5px rgba(44, 123, 229, 0.5);
+}
+
+.formulario-campos button[type="submit"] {
+    margin-top: 1rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #2c7be5;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    width: fit-content;
+    transition: background-color 0.3s ease;
+}
+
+.formulario-campos button[type="submit"]:hover {
+    background-color: #1e5bb8;
+}
+
+.logo-zorro {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    width: 80px;
+    /* Reducido de 100px a 80px */
+    height: auto;
+    max-width: 100%;
+}
+
+.success-message {
+    color: green;
+    margin-top: 1rem;
+}
+
+/* ==============================
+     Listado de estudiantes
+     ============================== */
+.listado-container {
+    background-color: #263545;
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #fff;
+}
+
+/* Título dentro del listado */
+.listado-container h2 {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+/* Grid de tarjetas: dos columnas */
+.listado-container .student-list-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+/* Cada tarjeta de estudiante */
+.listado-container .student-card {
+    background-color: #ffffff;
+    color: #000;
+    /* Forzamos texto negro */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Cabecera de la tarjeta: avatar + datos */
+.listado-container .student-card-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+/* Imagen de avatar */
+.listado-container .student-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+}
+
+/* Contenido del header (nombre, nivel, experiencia) */
+.listado-container .student-card-header-content h3,
+.listado-container .student-card-header-content p {
+    margin: 0;
+    color: #000;
+    /* Aseguramos color negro */
+}
+
+/* Icono de eliminar */
+.listado-container .delete-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-left: auto;
+    /* Empuja hacia la derecha */
+}
+
+/* Cuerpo de la tarjeta */
+.listado-container .student-card-body {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    color: #000;
+    /* En caso de que haya texto acá */
+}
+
+/* Pie de tarjeta (si en el futuro agregas botones o enlaces) */
+.listado-container .student-card-footer {
+    padding: 1rem;
+    background-color: #f1f1f1;
+    text-align: center;
+}
+
+.listado-container .student-card-footer a {
+    color: #2c7be5;
+    text-decoration: none;
+}
+
+.listado-container .student-card-footer a:hover {
+    text-decoration: underline;
+}
