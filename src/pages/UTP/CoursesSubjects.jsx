@@ -1,78 +1,337 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import "../../styles/UTP/Teachers.css"; // Reutilizamos el CSS
+import logoZorro from "../../assets/logo.png";
+import toggleIcon from "../../assets/toggledown.png";
+import api from "../../services/api";
+import Swal from "sweetalert2";
+import botonEliminar from "../../assets/botonEliminar.png";
+import { getUserFromStorage, getToken } from "../../utils/userUtils";
 
 const CoursesSubjects = () => {
-  const [courseName, setCourseName] = useState('');
-  const [subjectName, setSubjectName] = useState('');
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [formCourse, setFormCourse] = useState({ name: "" });
+  const [formSubject, setFormSubject] = useState({ name: "" });
+  const [showCourseForm, setShowCourseForm] = useState(false);
+  const [showSubjectForm, setShowSubjectForm] = useState(false);
+  const [userSchoolId, setUserSchoolId] = useState("");
+  const [userTeacherId, setUserTeacherId] = useState("");
 
-  const handleAddCourse = (e) => {
-    e.preventDefault();
-    if (courseName.trim() === '') return;
+  useEffect(() => {
+    fetchCourses();
+    fetchSubjects();
 
-    setCourses([...courses, courseName]);
-    setCourseName('');
+    const user = getUserFromStorage();
+    if (user) {
+      console.log("Usuario logueado:", user);
+      console.log("SchoolId:", user.schoolId);
+      console.log("TeacherId (user.teacher?.id):", user.teacher?.id);
+
+      setUserSchoolId(user.schoolId);
+      setUserTeacherId(user.teacher?.id); // ✅ aquí el cambio correcto
+    } else {
+      console.log("No se encontró user en storage");
+    }
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const res = await api.get("/courses");
+      setCourses(res.data);
+    } catch (error) {
+      console.error("Error cargando cursos:", error);
+    }
   };
 
-  const handleAddSubject = (e) => {
-    e.preventDefault();
-    if (subjectName.trim() === '') return;
+  const fetchSubjects = async () => {
+    try {
+      const res = await api.get("/subjects");
+      setSubjects(res.data);
+    } catch (error) {
+      console.error("Error cargando asignaturas:", error);
+    }
+  };
 
-    setSubjects([...subjects, subjectName]);
-    setSubjectName('');
+  const handleSubmitCourse = async (e) => {
+    e.preventDefault();
+
+    if (!formCourse.name || !userSchoolId || !userTeacherId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor completa todos los campos requeridos.",
+      });
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: "Creando Curso...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const token = getToken();
+
+      const courseBody = {
+        name: formCourse.name,
+        schoolId: userSchoolId,
+        teacherId: userTeacherId,
+      };
+
+      console.log("Enviando curso:", courseBody);
+
+      await api.post("/courses", courseBody, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      await fetchCourses();
+
+      Swal.fire({
+        icon: "success",
+        title: "Curso creado exitosamente",
+      });
+
+      setFormCourse({ name: "" });
+    } catch (error) {
+      console.error("Error al crear curso:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error al crear curso",
+        text: error.message || "Revisa los datos e intenta nuevamente.",
+      });
+    }
+  };
+
+  const handleSubmitSubject = async (e) => {
+    e.preventDefault();
+
+    if (!formSubject.name) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campo incompleto",
+        text: "Por favor ingresa el nombre de la asignatura.",
+      });
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: "Creando Asignatura...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const token = getToken();
+
+      const subjectBody = { name: formSubject.name };
+
+      await api.post("/subjects", subjectBody, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      await fetchSubjects();
+
+      Swal.fire({
+        icon: "success",
+        title: "Asignatura creada exitosamente",
+      });
+
+      setFormSubject({ name: "" });
+    } catch (error) {
+      console.error("Error al crear asignatura:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error al crear asignatura",
+        text: error.message || "Revisa los datos e intenta nuevamente.",
+      });
+    }
+  };
+
+  const handleDeleteCourse = async (courseId, courseName) => {
+    Swal.fire({
+      title: `¿Eliminar el curso "${courseName}"?`,
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await api.delete(`/courses/${courseId}`);
+          setCourses((prev) => prev.filter((c) => c.id !== courseId));
+
+          Swal.fire({
+            icon: "success",
+            title: "Curso eliminado",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch (e) {
+          console.error("Error al eliminar curso:", e);
+          Swal.fire({
+            icon: "error",
+            title: "Error al eliminar curso",
+          });
+        }
+      }
+    });
+  };
+
+  const handleDeleteSubject = async (subjectId, subjectName) => {
+    Swal.fire({
+      title: `¿Eliminar la asignatura "${subjectName}"?`,
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await api.delete(`/subjects/${subjectId}`);
+          setSubjects((prev) => prev.filter((s) => s.id !== subjectId));
+
+          Swal.fire({
+            icon: "success",
+            title: "Asignatura eliminada",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch (e) {
+          console.error("Error al eliminar asignatura:", e);
+          Swal.fire({
+            icon: "error",
+            title: "Error al eliminar asignatura",
+          });
+        }
+      }
+    });
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Gestión de Cursos y Asignaturas</h1>
-
-      <div style={{ display: 'flex', gap: '40px', marginTop: '20px' }}>
-        {/* Formulario de Course */}
-        <div style={{ flex: 1 }}>
-          <h2>Crear Curso</h2>
-          <form onSubmit={handleAddCourse}>
-            <input
-              type="text"
-              value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
-              placeholder="Nombre del Curso"
-              style={{ padding: '8px', width: '100%', marginBottom: '10px' }}
-            />
-            <button type="submit" style={{ padding: '8px 16px' }}>
-              Agregar Curso
-            </button>
-          </form>
-
-          {/* Lista de Courses */}
-          <ul style={{ marginTop: '20px' }}>
-            {courses.map((course, index) => (
-              <li key={index}>{course}</li>
-            ))}
-          </ul>
+    <div className="teachers-page">
+      <div className="formularios-contenedor">
+        {/* Formulario Curso */}
+        <div className={`formulario-container ${showCourseForm ? "" : "collapsed"}`}>
+          <div className="toggle-button" onClick={() => setShowCourseForm(!showCourseForm)}>
+            <img src={toggleIcon} alt="Toggle" />
+          </div>
+          <div className="formulario-campos">
+            <h2>Crear Nuevo Curso</h2>
+            {showCourseForm && (
+              <form onSubmit={handleSubmitCourse}>
+                <label>
+                  <span>Nombre del Curso</span>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formCourse.name}
+                    onChange={(e) =>
+                      setFormCourse({ ...formCourse, name: e.target.value })
+                    }
+                    required
+                  />
+                </label>
+                <button type="submit">Crear Curso</button>
+              </form>
+            )}
+          </div>
+          <img src={logoZorro} alt="Logo Zorro" className="logo-zorro-docente" />
         </div>
 
-        {/* Formulario de Subject */}
-        <div style={{ flex: 1 }}>
-          <h2>Crear Asignatura</h2>
-          <form onSubmit={handleAddSubject}>
-            <input
-              type="text"
-              value={subjectName}
-              onChange={(e) => setSubjectName(e.target.value)}
-              placeholder="Nombre de la Asignatura"
-              style={{ padding: '8px', width: '100%', marginBottom: '10px' }}
-            />
-            <button type="submit" style={{ padding: '8px 16px' }}>
-              Agregar Asignatura
-            </button>
-          </form>
+        {/* Formulario Subject */}
+        <div className={`formulario-container ${showSubjectForm ? "" : "collapsed"}`}>
+          <div className="toggle-button" onClick={() => setShowSubjectForm(!showSubjectForm)}>
+            <img src={toggleIcon} alt="Toggle" />
+          </div>
+          <div className="formulario-campos">
+            <h2>Crear Nueva Asignatura</h2>
+            {showSubjectForm && (
+              <form onSubmit={handleSubmitSubject}>
+                <label>
+                  <span>Nombre de la Asignatura</span>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formSubject.name}
+                    onChange={(e) =>
+                      setFormSubject({ ...formSubject, name: e.target.value })
+                    }
+                    required
+                  />
+                </label>
+                <button type="submit">Crear Asignatura</button>
+              </form>
+            )}
+          </div>
+          <img src={logoZorro} alt="Logo Zorro" className="logo-zorro-asignatura" />
+        </div>
+      </div>
 
-          {/* Lista de Subjects */}
-          <ul style={{ marginTop: '20px' }}>
-            {subjects.map((subject, index) => (
-              <li key={index}>{subject}</li>
-            ))}
-          </ul>
+      {/* Listado de Courses */}
+      <div className="listado-container">
+        <h2>Listado de Cursos</h2>
+        <div className="teacher-cards">
+          {courses.length > 0 ? (
+            courses.map((course) => (
+              <div key={course.id} className="teacher-card">
+                <div className="teacher-card-header">
+                  <h3>{course.name}</h3>
+                  <img
+                    src={botonEliminar}
+                    alt="Eliminar"
+                    className="delete-icon"
+                    onClick={() => handleDeleteCourse(course.id, course.name)}
+                  />
+                </div>
+                <div className="teacher-card-body">
+                  <p>ID Colegio: {course.schoolId}</p>
+                  <p>ID Profesor: {course.teacherId}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No hay cursos registrados.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Listado de Subjects */}
+      <div className="listado-container">
+        <h2>Listado de Asignaturas</h2>
+        <div className="teacher-cards">
+          {subjects.length > 0 ? (
+            subjects.map((subject) => (
+              <div key={subject.id} className="teacher-card">
+                <div className="teacher-card-header">
+                  <h3>{subject.name}</h3>
+                  <img
+                    src={botonEliminar}
+                    alt="Eliminar"
+                    className="delete-icon"
+                    onClick={() => handleDeleteSubject(subject.id, subject.name)}
+                  />
+                </div>
+                <div className="teacher-card-body">
+                  <p>ID: {subject.id}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No hay asignaturas registradas.</p>
+          )}
         </div>
       </div>
     </div>

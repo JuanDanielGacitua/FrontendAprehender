@@ -1,5 +1,3 @@
-// src/pages/UTP/Teachers.jsx
-
 import React, { useState, useEffect } from "react";
 import "../../styles/UTP/Teachers.css";
 import logoZorro from "../../assets/logo.png";

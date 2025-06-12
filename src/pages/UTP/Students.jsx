@@ -77,6 +77,7 @@ const UTPStudents = () => {
         },
       });
 
+      // 1️⃣ Crear el estudiante en tabla Student
       const newStudent = await studentService.create({
         nombre: formData.nombre,
         level: formData.level,
@@ -87,12 +88,12 @@ const UTPStudents = () => {
 
       const token = getToken();
 
+      // 2️⃣ Crear el User (sin confiar en que studentId quede bien)
       const userPayload = {
         username: formData.nombre,
         email: `${formData.nombre.toLowerCase().replace(/\s/g, "")}${Date.now()}@zorrecursos.cl`,
         password: formData.password,
         schoolId: userSchoolId,
-        studentId: newStudent.id,
         role: "STUDENT",
       };
 
@@ -104,24 +105,33 @@ const UTPStudents = () => {
         },
       });
 
-      if (userResponse.status === 200) {
-        Swal.close();
-        Swal.fire({
-          icon: "success",
-          title: "Estudiante y usuario creados exitosamente",
-          html: `Email generado: <strong>${userPayload.email}</strong>`,
-          confirmButtonText: "Aceptar",
-        });
-      } else {
-        Swal.close();
-        Swal.fire({
-          icon: "warning",
-          title: "Error parcial",
-          text: "Estudiante creado, pero hubo un error creando usuario.",
-        });
+      const createdUser = userResponse.data.user || userResponse.data;
+
+      if (!createdUser?.id) {
+        throw new Error("Error al crear el User");
       }
 
+      // 3️⃣ Ahora actualizar el campo studentId con PUT
+      await api.put(`/users/${createdUser.id}`, {
+        studentId: newStudent.id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 4️⃣ Mostrar éxito
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Estudiante y usuario creados exitosamente",
+        html: `Email generado: <strong>${userPayload.email}</strong>`,
+        confirmButtonText: "Aceptar",
+      });
+
+      // Reset form
       setFormData({ nombre: "", level: 1, experience: 1, password: "" });
+
     } catch (error) {
       console.error("Error al crear estudiante y usuario:", error);
       Swal.close();
@@ -168,45 +178,41 @@ const UTPStudents = () => {
           {showForm && (
             <form onSubmit={handleSubmit}>
               <label>
-                <span>Nombre</span>
+                Nombre
                 <input
                   type="text"
                   name="nombre"
                   value={formData.nombre}
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                  required
                 />
               </label>
               <label>
-                <span>Nivel</span>
+                Nivel
                 <input
                   type="number"
                   name="level"
                   value={formData.level}
                   onChange={(e) => setFormData({ ...formData, level: parseInt(e.target.value, 10) })}
                   min="1"
-                  required
                 />
               </label>
               <label>
-                <span>Experiencia</span>
+                Experiencia
                 <input
                   type="number"
                   name="experience"
                   value={formData.experience}
                   onChange={(e) => setFormData({ ...formData, experience: parseInt(e.target.value, 10) })}
                   min="0"
-                  required
                 />
               </label>
               <label>
-                <span>Contraseña</span>
+                Contraseña
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
                 />
               </label>
 
@@ -222,7 +228,7 @@ const UTPStudents = () => {
         <div className="student-list-section">
           {students.length > 0 ? (
             students
-              .filter((st) => st.id) // Para evitar warning de key
+              .filter((st) => st.id)
               .map((st) => (
                 <div key={st.id} className="student-card">
                   <div className="student-card-header">

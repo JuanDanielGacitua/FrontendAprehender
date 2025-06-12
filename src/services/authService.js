@@ -3,10 +3,10 @@
 import api from "./api";
 
 // Logueo: envía { nick, password } a /auth/login y guarda token + user en localStorage
-const login = async ({ nick, password }) => {
+const login = async ({ nick: username, password }) => {
   try {
     const response = await api.post("/auth/login", { 
-        username: nick, 
+        username, 
         password });
     console.log("Respuesta completa del login:", response.data);
     const { token, user } = response.data;
