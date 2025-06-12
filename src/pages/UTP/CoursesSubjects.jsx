@@ -1,5 +1,7 @@
+// src/pages/UTP/CoursesSubjects.jsx
+
 import React, { useState, useEffect } from "react";
-import "../../styles/UTP/Teachers.css"; // Reutilizamos el CSS
+import "../../styles/UTP/CoursesSubjects.css";
 import logoZorro from "../../assets/logo.png";
 import toggleIcon from "../../assets/toggledown.png";
 import api from "../../services/api";
@@ -23,14 +25,8 @@ const CoursesSubjects = () => {
 
     const user = getUserFromStorage();
     if (user) {
-      console.log("Usuario logueado:", user);
-      console.log("SchoolId:", user.schoolId);
-      console.log("TeacherId (user.teacher?.id):", user.teacher?.id);
-
       setUserSchoolId(user.schoolId);
-      setUserTeacherId(user.teacher?.id); // ✅ aquí el cambio correcto
-    } else {
-      console.log("No se encontró user en storage");
+      setUserTeacherId(user.teacher?.id);
     }
   }, []);
 
@@ -80,8 +76,6 @@ const CoursesSubjects = () => {
         schoolId: userSchoolId,
         teacherId: userTeacherId,
       };
-
-      console.log("Enviando curso:", courseBody);
 
       await api.post("/courses", courseBody, {
         headers: { Authorization: `Bearer ${token}` },
@@ -221,7 +215,7 @@ const CoursesSubjects = () => {
   };
 
   return (
-    <div className="teachers-page">
+    <div className="courses-subjects-page">
       <div className="formularios-contenedor">
         {/* Formulario Curso */}
         <div className={`formulario-container ${showCourseForm ? "" : "collapsed"}`}>
@@ -297,8 +291,8 @@ const CoursesSubjects = () => {
                   />
                 </div>
                 <div className="teacher-card-body">
-                  <p>ID Colegio: {course.schoolId}</p>
-                  <p>ID Profesor: {course.teacherId}</p>
+                  <p>Colegio: {course.schoolName}</p>
+                  <p>Profesor: {course.teacherName}</p>
                 </div>
               </div>
             ))
@@ -325,7 +319,7 @@ const CoursesSubjects = () => {
                   />
                 </div>
                 <div className="teacher-card-body">
-                  <p>ID: {subject.id}</p>
+                  {/* No mostrar el ID */}
                 </div>
               </div>
             ))

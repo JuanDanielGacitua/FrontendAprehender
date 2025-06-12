@@ -58,7 +58,7 @@ const UTPStudents = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.nombre || !formData.password || !userSchoolId) {
       Swal.fire({
         icon: "warning",
@@ -67,7 +67,7 @@ const UTPStudents = () => {
       });
       return;
     }
-
+  
     try {
       Swal.fire({
         title: "Creando Estudiante...",
@@ -76,19 +76,28 @@ const UTPStudents = () => {
           Swal.showLoading();
         },
       });
-
+  
       // 1️⃣ Crear el estudiante en tabla Student
-      const newStudent = await studentService.create({
+      const newStudentResponse = await studentService.create({
         nombre: formData.nombre,
         level: formData.level,
         experience: formData.experience,
       });
-
+  
+      console.log("✅ newStudentResponse:", newStudentResponse);
+  
+      const newStudent = newStudentResponse.student;
+  
+      const studentId = newStudent?.id;
+  
+      console.log("🎓 studentId obtenido:", studentId);
+  
+      // Aquí sí guardas el student "limpio", no el objeto con {message, student}
       setStudents((prev) => [...prev, newStudent]);
-
+  
       const token = getToken();
-
-      // 2️⃣ Crear el User (sin confiar en que studentId quede bien)
+  
+      // 2️⃣ Crear el User
       const userPayload = {
         username: formData.nombre,
         email: `${formData.nombre.toLowerCase().replace(/\s/g, "")}${Date.now()}@zorrecursos.cl`,
@@ -96,30 +105,35 @@ const UTPStudents = () => {
         schoolId: userSchoolId,
         role: "STUDENT",
       };
-
-      console.log("Enviando userPayload:", userPayload);
-
+  
+      console.log("🚀 Enviando userPayload (POST /users):", userPayload);
+  
       const userResponse = await api.post("/users", userPayload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       const createdUser = userResponse.data.user || userResponse.data;
-
+  
       if (!createdUser?.id) {
         throw new Error("Error al crear el User");
       }
-
+  
       // 3️⃣ Ahora actualizar el campo studentId con PUT
+      console.log("🔁 Actualizando user con studentId (PUT /users/:id):", {
+        id: createdUser.id,
+        studentId: studentId,
+      });
+  
       await api.put(`/users/${createdUser.id}`, {
-        studentId: newStudent.id,
+        studentId: studentId,
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       // 4️⃣ Mostrar éxito
       Swal.close();
       Swal.fire({
@@ -128,10 +142,10 @@ const UTPStudents = () => {
         html: `Email generado: <strong>${userPayload.email}</strong>`,
         confirmButtonText: "Aceptar",
       });
-
+  
       // Reset form
       setFormData({ nombre: "", level: 1, experience: 1, password: "" });
-
+  
     } catch (error) {
       console.error("Error al crear estudiante y usuario:", error);
       Swal.close();
@@ -142,6 +156,8 @@ const UTPStudents = () => {
       });
     }
   };
+  
+  
 
   const confirmarEliminacion = async (student) => {
     const resultado = await Swal.fire({

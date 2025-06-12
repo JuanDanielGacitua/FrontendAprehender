@@ -1,0 +1,186 @@
+.courses-subjects-page {
+    padding: 2rem;
+    background-color: #f5f5f5;
+    max-width: 1200px;
+    margin: auto;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.formularios-contenedor {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.formulario-container {
+    background-color: #ffffff !important;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 400px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: max-height 0.5s ease, padding 0.5s ease, opacity 0.5s ease;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.formulario-container.collapsed {
+    max-height: 60px;
+    padding: 1rem;
+    opacity: 0.8;
+}
+
+.toggle-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.toggle-button img {
+    width: 20px;
+    height: 20px;
+}
+
+.formulario-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: #263545 !important;
+}
+
+.formulario-campos h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #263545 !important;
+    font-weight: bold;
+    text-align: center;
+}
+
+.formulario-campos label {
+    color: #263545 !important;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.formulario-campos input[type="text"],
+.formulario-campos select {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #263545 !important;
+    font-size: 1rem;
+    width: 80%;
+    box-sizing: border-box;
+    color: #263545 !important;
+    background-color: #ffffff !important;
+    margin-bottom: 1rem;
+}
+
+.formulario-campos input[type="text"]:focus,
+.formulario-campos select:focus {
+    border-color: #2c7be5 !important;
+    outline: none;
+    box-shadow: 0 0 5px rgba(44, 123, 229, 0.5);
+}
+
+.formulario-campos button {
+    padding: 0.8rem 1.5rem;
+    background-color: #263545 !important;
+    color: #ffffff !important;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.formulario-campos button:hover {
+    background-color: #1e5bb8 !important;
+}
+
+.logo-zorro-docente,
+.logo-zorro-asignatura {
+    width: 80px;
+    height: auto;
+    position: absolute;
+    bottom: 60px;
+    right: 20px;
+    max-width: 100%;
+}
+
+.listado-container {
+    background-color: #263545;
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    width: 100%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.listado-container h2 {
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.teacher-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    justify-items: center;
+}
+
+.teacher-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 350px;
+}
+
+.teacher-card-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+.teacher-card-header h3 {
+    margin: 0;
+    color: #263545;
+    flex: 1;
+}
+
+.teacher-card-body {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    color: #263545;
+}
+
+.delete-icon {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+.teacher-cards p {
+    color: #263545;
+    text-align: center;
+}

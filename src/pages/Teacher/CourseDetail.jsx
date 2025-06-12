@@ -1,19 +1,17 @@
+// src/pages/Teacher/CourseDetail.jsx
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import MaterialForm from "../../components/Courses/MaterialForm";
-import MaterialList from "../../components/Courses/MaterialList";
-import ActivityForm from "../../components/Courses/ActivityForm";
-import ActivityList from "../../components/Courses/ActivityList";
-import "../../styles/Courses.css";
-import materialImage from "../../assets/material_estudio.jpeg";
-import evaluacionImage from "../../assets/evaluaciones.jpeg";
+import UnitForm from "../../components/Courses/UnitForm";
+import UnitList from "../../components/Courses/UnitList";
 import estudianteImage from "../../assets/EstudianteFondo.jpeg";
+import unidadImage from "../../assets/ObjetivoLogo.jpeg"; // Usa una imagen para la pestaña Unidades
 import { getUserFromStorage } from "../../utils/userUtils";
 
 const CourseDetail = () => {
   const { id } = useParams();
   const [curso, setCurso] = useState(null);
-  const [activeTab, setActiveTab] = useState("material");
+  const [activeTab, setActiveTab] = useState("unidades");
   const [estudiantes, setEstudiantes] = useState([]);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const CourseDetail = () => {
     fetch(`https://aprehender-backendapi.fly.dev/students?schoolId=${user.schoolId}`)
       .then((res) => res.json())
       .then((data) => {
-        // Por ahora no tienes campo courseId en student → los mostramos todos del colegio
         setEstudiantes(data);
       })
       .catch((err) => console.error("Error cargando estudiantes:", err));
@@ -54,19 +51,11 @@ const CourseDetail = () => {
 
       <div className="cards-grid">
         <div
-          className={`course-card-item ${activeTab === "material" ? "active" : ""}`}
-          onClick={() => setActiveTab("material")}
+          className={`course-card-item ${activeTab === "unidades" ? "active" : ""}`}
+          onClick={() => setActiveTab("unidades")}
         >
-          <img src={materialImage} alt="Material de Estudio" />
-          <h3>Material de Estudio</h3>
-        </div>
-
-        <div
-          className={`course-card-item ${activeTab === "actividad" ? "active" : ""}`}
-          onClick={() => setActiveTab("actividad")}
-        >
-          <img src={evaluacionImage} alt="Evaluaciones" />
-          <h3>Evaluaciones</h3>
+          <img src={unidadImage} alt="Unidades" />
+          <h3>Unidades</h3>
         </div>
 
         <div
@@ -78,17 +67,10 @@ const CourseDetail = () => {
         </div>
       </div>
 
-      {activeTab === "material" && (
+      {activeTab === "unidades" && (
         <div className="materiales-card">
-          <MaterialForm courseId={curso.id} />
-          <MaterialList courseId={curso.id} />
-        </div>
-      )}
-
-      {activeTab === "actividad" && (
-        <div className="materiales-card">
-          <ActivityList courseId={curso.id} />
-          <ActivityForm courseId={curso.id} />
+          <UnitForm courseId={curso.id} />
+          <UnitList courseId={curso.id} />
         </div>
       )}
 
