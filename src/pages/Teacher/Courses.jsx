@@ -1,90 +1,99 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/Teacher/Courses.jsx
+
+import React, { useEffect, useState, useCallback } from "react";
 import "../../styles/Courses.css";
-import CreateCourseForm from "../../components/Courses/CreateCourseForm";
-import coursesImage from "../../assets/cursos.jpeg";
+import UnitForm from "../../components/Courses/UnitForm";
+import ExerciseForm from "../../components/Courses/ExerciseForm";
+import unitService from "../../services/unitService";
 import { getUserFromStorage } from "../../utils/userUtils";
 
 const Courses = () => {
-  const [courses, setCourses] = useState([]);
-  const navigate = useNavigate();
   const user = getUserFromStorage();
+  const subjectName = user?.subject?.name || "Asignatura";
+  const subjectId = user?.subject?.id;
+
+  const [units, setUnits] = useState([]);
+  const [selectedUnitId, setSelectedUnitId] = useState("");
+
+  const fetchUnits = useCallback(async () => {
+    try {
+      if (!subjectId) return;
+      const response = await unitService.getUnits(subjectId);
+      setUnits(response);
+    } catch (error) {
+      console.error("Error cargando unidades:", error);
+    }
+  }, [subjectId]);
 
   useEffect(() => {
-    fetch("https://aprehender-backendapi.fly.dev/courses")
-      .then((res) => res.json())
-      .then((data) => {
-        // Filtrar cursos que correspondan al subjectId del docente
-        const cursosFiltrados = data.filter((curso) => curso.subjectId === user.subjectId);
-        setCourses(cursosFiltrados);
-      })
-      .catch((err) => console.error("Error cargando cursos:", err));
-  }, [user.subjectId]);
+    fetchUnits();
+  }, [fetchUnits]);
 
-  const handleCourseCreated = (nuevoCurso) => {
-    // Si el nuevo curso es del subjectId del docente, lo agregamos
-    if (nuevoCurso.subjectId === user.subjectId) {
-      setCourses((prev) => [...prev, nuevoCurso]);
-    }
+  const handleUnitCreated = () => {
+    fetchUnits();
   };
 
-  const obtenerClaseTema = (subject) => {
-    if (subject.toLowerCase() === "matemáticas") return "tema-matematicas";
-    if (subject.toLowerCase() === "lenguaje") return "tema-lenguaje";
-    return "";
+  const handleExerciseCreated = () => {
+    console.log("✅ Ejercicio creado con éxito");
   };
-
-  // Agrupar cursos por Grado
-  const cursosPorGrado = courses.reduce((acc, curso) => {
-    if (!acc[curso.grade]) {
-      acc[curso.grade] = [];
-    }
-    acc[curso.grade].push(curso);
-    return acc;
-  }, {});
 
   return (
     <div className="courses-container">
-      <h1>Listado de Cursos</h1>
-      <p>Selecciona un curso para ver su programa.</p>
+      <h1 className="courses-title">Asignatura: {subjectName}</h1>
+      <p>Administra las unidades y ejercicios de tu asignatura.</p>
 
-      <CreateCourseForm onCourseCreated={handleCourseCreated} />
-
-      {Object.keys(cursosPorGrado).length === 0 ? (
-        <p>No hay cursos disponibles.</p>
-      ) : (
-        Object.keys(cursosPorGrado).map((grado) => (
-          <div key={grado} className="grado-section">
-            <h2>{grado}</h2>
-            <div className="cards-grid">
-              {cursosPorGrado[grado].map((curso) => (
-                <div
-                  key={curso.id}
-                  className={`course-card-item ${obtenerClaseTema(curso.subject)}`}
-                  onClick={() => navigate(`/home/courses/${curso.id}`)}
-                >
-                  <div className="card-image-container">
-                    <img src={coursesImage} alt="Curso" />
-                  </div>
-                  <div className="card-bottom">
-                    <h3>{curso.subject}</h3>
-                    <p className="course-id">ID: {curso.id}</p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/home/courses/${curso.id}`);
-                      }}
-                      className="ver-programa-btn"
-                    >
-                      Ver Programa
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* FORMULARIOS CON ESTILO */}
+      <div className="formularios-contenedor">
+        <div className="formulario-container">
+          <div className="formulario-campos">
+            <h2>Crear Nueva Unidad</h2>
+            <UnitForm subjectId={subjectId} onUnitCreated={handleUnitCreated} />
           </div>
-        ))
-      )}
+        </div>
+      </div>
+
+      {/* LISTADO DE UNIDADES */}
+      <div className="listado-container">
+        <h2>Listado de Unidades</h2>
+        {units.length === 0 ? (
+          <p>No hay unidades registradas.</p>
+        ) : (
+          <div className="cards-grid">
+            {units.map((unit) => (
+              <div key={unit.id} className="teacher-card">
+                <div className="teacher-card-header">
+                  <h3>{unit.title}</h3>
+                </div>
+                <div className="teacher-card-body">
+                  <p>Descripción: {unit.description}</p>
+                  <p>Orden: {unit.order}</p>
+                  <button
+                    className="crear-btn"
+                    onClick={() =>
+                      setSelectedUnitId((prev) => (prev === unit.id ? "" : unit.id))
+                    }
+                  >
+                    {selectedUnitId === unit.id
+                      ? "Cancelar Crear Ejercicio"
+                      : "➕ Crear Ejercicio"}
+                  </button>
+
+                  {/* FORMULARIO DE EJERCICIO */}
+                  {selectedUnitId === unit.id && (
+                    <div className="formulario-campos" style={{ marginTop: "1rem" }}>
+                      <ExerciseForm
+                        unitId={unit.id}
+                        subjectId={subjectId}
+                        onExerciseCreated={handleExerciseCreated}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

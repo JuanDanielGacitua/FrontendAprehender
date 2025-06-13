@@ -1,53 +1,77 @@
-import React, { useState } from "react";
+// src/components/Courses/UnitForm.jsx
 
-const UnitForm = ({ courseId, onUnitCreated }) => {
+import React, { useState } from "react";
+import Swal from "sweetalert2";
+import unitService from "../../services/unitService";
+import { getToken } from "../../utils/userUtils";
+
+const UnitForm = ({ subjectId, onUnitCreated }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    order: 1,
+    order: "",
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.title || !formData.order || !subjectId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor completa todos los campos requeridos.",
+      });
+      return;
+    }
+
     try {
-      const response = await fetch("https://aprehender-backendapi.fly.dev/api/units", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          order: parseInt(formData.order),
-          courseId,
-        }),
+      Swal.fire({
+        title: "Creando Unidad...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        alert("✅ Unidad creada exitosamente.");
-        if (typeof onUnitCreated === "function") {
-          onUnitCreated(result.unit);
-        }
-        setFormData({ title: "", description: "", order: 1 });
-      } else {
-        const errorData = await response.json();
-        alert(`❌ ${errorData.error || "Error al crear unidad."}`);
-      }
+      const token = getToken();
+
+      const unitBody = {
+        title: formData.title,
+        description: formData.description,
+        order: parseInt(formData.order, 10),
+        subjectId,
+      };
+
+      await unitService.createUnit(unitBody, token);
+
+      Swal.fire({
+        icon: "success",
+        title: "Unidad creada exitosamente",
+      });
+
+      setFormData({ title: "", description: "", order: "" });
+
+      if (onUnitCreated) onUnitCreated();
     } catch (error) {
-      console.error("Error:", error);
-      alert("❌ Error de conexión.");
+      console.error("Error al crear unidad:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error al crear unidad",
+        text: error.message || "Revisa los datos e intenta nuevamente.",
+      });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="unit-form">
-      <h3>Crear Nueva Unidad</h3>
-
+    <form onSubmit={handleSubmit} className="formulario-campos">
       <label>
-        Título:
+        Título de la unidad:
         <input
           type="text"
           name="title"
@@ -56,30 +80,26 @@ const UnitForm = ({ courseId, onUnitCreated }) => {
           required
         />
       </label>
-
       <label>
         Descripción:
-        <textarea
+        <input
+          type="text"
           name="description"
           value={formData.description}
           onChange={handleChange}
-          required
         />
       </label>
-
       <label>
         Orden:
         <input
           type="number"
           name="order"
           value={formData.order}
-          min="1"
           onChange={handleChange}
           required
         />
       </label>
-
-      <button type="submit">Crear Unidad</button>
+      <button type="submit" className="crear-btn">Crear Unidad</button>
     </form>
   );
 };
