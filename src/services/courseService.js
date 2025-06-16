@@ -22,12 +22,17 @@ const deleteCourse = (id) => {
   return api.delete(`/courses/${id}`);
 };
 
+const enrollStudent = (courseId, studentId) => {
+  return api.post("/enrollments", { courseId, studentId });
+};
+
 const courseService = {
   getCourses,
   getCourseById,
   createCourse,
   updateCourse,
   deleteCourse,
+  enrollStudent,
 };
 
 export default courseService;

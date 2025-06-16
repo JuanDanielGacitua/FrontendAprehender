@@ -123,7 +123,10 @@ const CoursesSubjects = () => {
 
       const token = getToken();
 
-      const subjectBody = { name: formSubject.name };
+      const subjectBody = {
+        name: formSubject.name,
+        courseId: formSubject.courseId,
+      };
 
       await api.post("/subjects", subjectBody, {
         headers: { Authorization: `Bearer ${token}` },
@@ -136,7 +139,7 @@ const CoursesSubjects = () => {
         title: "Asignatura creada exitosamente",
       });
 
-      setFormSubject({ name: "" });
+      setFormSubject({ name: "", courseId: "" });
     } catch (error) {
       console.error("Error al crear asignatura:", error);
       Swal.close();
@@ -266,6 +269,25 @@ const CoursesSubjects = () => {
                     required
                   />
                 </label>
+
+                <label>
+                  <span>Curso</span>
+                  <select
+                    value={formSubject.courseId || ""}
+                    onChange={(e) =>
+                      setFormSubject({ ...formSubject, courseId: e.target.value })
+                    }
+                    required
+                  >
+                    <option value="">Seleccione un curso</option>
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
                 <button type="submit">Crear Asignatura</button>
               </form>
             )}

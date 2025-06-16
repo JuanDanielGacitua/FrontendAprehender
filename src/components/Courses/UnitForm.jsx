@@ -1,26 +1,50 @@
 // src/components/Courses/UnitForm.jsx
 
-import React, { useState } from "react";
 import Swal from "sweetalert2";
 import unitService from "../../services/unitService";
-import { getToken } from "../../utils/userUtils";
+import { getToken, getUserFromStorage } from "../../utils/userUtils";
+import React, { useState, useEffect } from "react";
+import api from "../../services/api";
 
-const UnitForm = ({ subjectId, onUnitCreated }) => {
+const UnitForm = ({ onUnitCreated }) => {
+  const user = getUserFromStorage();
+  const subjectId = user?.subject?.id;
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     order: "",
+    courseId: ""
   });
+
+  const [courses, setCourses] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await api.get("/courses");
+        setCourses(res.data);
+      } catch (error) {
+        console.error("Error al cargar cursos:", error);
+      }
+    };
+    fetchCourses();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.order || !subjectId) {
+    if (
+      !formData.title.trim() ||
+      isNaN(parseInt(formData.order)) ||
+      !formData.courseId.trim() ||
+      !subjectId
+    ) {
       Swal.fire({
         icon: "warning",
         title: "Campos incompletos",
@@ -40,10 +64,19 @@ const UnitForm = ({ subjectId, onUnitCreated }) => {
 
       const token = getToken();
 
+      console.log("🧾 Enviando unidad:", {
+        title: formData.title,
+        description: formData.description,
+        order: parseInt(formData.order, 10),
+        courseId: formData.courseId,
+        subjectId,
+      });
+
       const unitBody = {
         title: formData.title,
         description: formData.description,
         order: parseInt(formData.order, 10),
+        courseId: formData.courseId,
         subjectId,
       };
 
@@ -54,7 +87,7 @@ const UnitForm = ({ subjectId, onUnitCreated }) => {
         title: "Unidad creada exitosamente",
       });
 
-      setFormData({ title: "", description: "", order: "" });
+      setFormData({ title: "", description: "", order: "", courseId: "" });
 
       if (onUnitCreated) onUnitCreated();
     } catch (error) {
@@ -98,6 +131,22 @@ const UnitForm = ({ subjectId, onUnitCreated }) => {
           onChange={handleChange}
           required
         />
+      </label>
+      <label>
+        Curso:
+        <select
+          name="courseId"
+          value={formData.courseId}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Selecciona un curso</option>
+          {courses.map((course) => (
+            <option key={course.id} value={course.id}>
+              {course.name}
+            </option>
+          ))}
+        </select>
       </label>
       <button type="submit" className="crear-btn">Crear Unidad</button>
     </form>
