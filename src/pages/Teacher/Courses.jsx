@@ -5,6 +5,7 @@ import "../../styles/Courses.css";
 import UnitForm from "../../components/Courses/UnitForm";
 import ExerciseForm from "../../components/Courses/ExerciseForm";
 import unitService from "../../services/unitService";
+import api from "../../services/api";
 import { getUserFromStorage } from "../../utils/userUtils";
 
 const Courses = () => {
@@ -14,7 +15,9 @@ const Courses = () => {
 
   const [units, setUnits] = useState([]);
   const [selectedUnitId, setSelectedUnitId] = useState("");
+  const [subjectUnitMap, setSubjectUnitMap] = useState({}); // Mapea unitId => subjectUnitId
 
+  // Obtener unidades por subjectId
   const fetchUnits = useCallback(async () => {
     try {
       if (!subjectId) return;
@@ -29,6 +32,7 @@ const Courses = () => {
     fetchUnits();
   }, [fetchUnits]);
 
+  // Al crear unidad, refresca
   const handleUnitCreated = () => {
     fetchUnits();
   };
@@ -37,12 +41,40 @@ const Courses = () => {
     console.log("✅ Ejercicio creado con éxito");
   };
 
+  // Obtener subjectUnitId asociado a la unidad
+  const fetchSubjectUnitId = async (unitId) => {
+    const parsedUnitId = parseInt(unitId, 10);
+  
+    if (!subjectId || isNaN(parsedUnitId)) {
+      console.warn("❌ subjectId o unitId inválidos:", { subjectId, unitId });
+      return;
+    }
+  
+    try {
+      console.log(`📡 Llamando a: /subjects/${subjectId}/units/${parsedUnitId}`);
+  
+      const res = await api.get(`/subjects/${subjectId}/units/${parsedUnitId}`);
+  
+      const subjectUnitId = res.data.id;
+  
+      setSubjectUnitMap((prev) => ({
+        ...prev,
+        [unitId]: subjectUnitId,
+      }));
+  
+      setSelectedUnitId(unitId);
+    } catch (error) {
+      console.error("❌ Error al obtener subjectUnitId:", error.response?.data || error.message);
+    }
+  };
+  
+
   return (
     <div className="courses-container">
       <h1 className="courses-title">Asignatura: {subjectName}</h1>
       <p>Administra las unidades y ejercicios de tu asignatura.</p>
 
-      {/* FORMULARIOS CON ESTILO */}
+      {/* FORMULARIO DE UNIDAD */}
       <div className="formularios-contenedor">
         <div className="formulario-container">
           <div className="formulario-campos">
@@ -69,9 +101,13 @@ const Courses = () => {
                   <p>Orden: {unit.order}</p>
                   <button
                     className="crear-btn"
-                    onClick={() =>
-                      setSelectedUnitId((prev) => (prev === unit.id ? "" : unit.id))
-                    }
+                    onClick={() => {
+                      if (selectedUnitId === unit.id) {
+                        setSelectedUnitId(""); // cerrar
+                      } else {
+                        fetchSubjectUnitId(unit.id); // abrir y buscar subjectUnitId
+                      }
+                    }}
                   >
                     {selectedUnitId === unit.id
                       ? "Cancelar Crear Ejercicio"
@@ -79,11 +115,10 @@ const Courses = () => {
                   </button>
 
                   {/* FORMULARIO DE EJERCICIO */}
-                  {selectedUnitId === unit.id && (
+                  {selectedUnitId === unit.id && subjectUnitMap[unit.id] && (
                     <div className="formulario-campos" style={{ marginTop: "1rem" }}>
                       <ExerciseForm
-                        unitId={unit.id}
-                        subjectId={subjectId}
+                        subjectUnitId={subjectUnitMap[unit.id]}
                         onExerciseCreated={handleExerciseCreated}
                       />
                     </div>
