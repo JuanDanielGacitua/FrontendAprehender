@@ -2,10 +2,11 @@
     max-width: 400px;
     margin: 2rem auto;
     padding: 2rem;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #f4f4f6;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     font-family: 'Arial', sans-serif;
+    transition: all 0.3s ease-in-out;
 }
 
 .register-utp h2 {
@@ -31,10 +32,11 @@
 .register-utp input[type="password"] {
     padding: 0.8rem;
     border-radius: 8px;
-    border: 1px solid #263545;
-    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
     width: 100%;
     box-sizing: border-box;
+    font-size: 0.95rem;
 }
 
 .register-utp input:focus {
@@ -64,30 +66,17 @@
     margin-top: 0.5rem;
 }
 
-.lists-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    flex: 1;
-    max-width: 600px;
-}
-
-.sidebar-section {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.sidebar-section h3 {
-    margin-bottom: 0.8rem;
-}
-
 .register-utp-page {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: flex-start;
-    padding: 2rem;
+    gap: 3rem;
+    padding: 3rem 2rem;
+    flex-wrap: wrap;
+    background-color: #181b1b;
+    background-image: radial-gradient(#0d0f10 0.8px, transparent 0.8px);
+    background-size: 5px 5px;
+    min-height: 100vh;
 }
 
 .lists-section {
@@ -99,14 +88,16 @@
 }
 
 .sidebar-section {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #f4f4f6;
+    padding: 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
 }
 
 .sidebar-section h3 {
     margin-bottom: 0.8rem;
+    color: #1c1c1c;
 }
 
 .logout-button {
@@ -126,4 +117,86 @@
 }
 
 .logout-button:hover {
-    background-color: #c62828; }
+    background-color: #c62828;
+}
+
+.toggle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+/* Tabla tipo Excel mejorada */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.data-table thead {
+    background-color: #b5d0f9;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ccc;
+    padding: 0.6rem;
+    text-align: left;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.data-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.data-table tbody tr:hover {
+    background-color: #eef4ff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.middle-logo {
+    width: 200px;
+    opacity: 0.12;
+    margin: 0 2rem;
+    align-self: center;
+    pointer-events: none;
+    transition: filter 0.3s ease;
+    filter: brightness(160%) grayscale(100%);
+}
+
+/* Extra para contenedores */
+.form-container,
+.logo-container,
+.list-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
