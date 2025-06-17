@@ -6,6 +6,7 @@ import UnitForm from "../../components/Courses/UnitForm";
 import ExerciseForm from "../../components/Courses/ExerciseForm";
 import unitService from "../../services/unitService";
 import api from "../../services/api";
+import Swal from "sweetalert2";
 import { getUserFromStorage } from "../../utils/userUtils";
 
 const Courses = () => {
@@ -67,13 +68,73 @@ const Courses = () => {
       console.error("❌ Error al obtener subjectUnitId:", error.response?.data || error.message);
     }
   };
+
+  const handleActualizarMasivo = async () => {
+    const confirm = await Swal.fire({
+      title: "¿Actualizar progreso masivo?",
+      text: "Esta acción asignará las asignaturas y ejercicios a todos los estudiantes según su curso.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, actualizar",
+      cancelButtonText: "Cancelar",
+    });
+  
+    if (!confirm.isConfirmed) return;
+  
+    try {
+      Swal.fire({
+        title: "Procesando...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+  
+      await api.post("/students/student-subject-progress", {
+        actualizarMasivo: true,
+      });
+  
+      Swal.fire({
+        icon: "success",
+        title: "¡Proceso masivo completado!",
+        text: "Asignaciones y estados creados correctamente.",
+      });
+    } catch (error) {
+      console.error("❌ Error al actualizar progreso masivo:", error.response?.data || error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error al actualizar progreso",
+        text: "Ocurrió un problema, intenta nuevamente.",
+      });
+    }
+  };
+  
   
 
   return (
     <div className="courses-container">
       <h1 className="courses-title">Asignatura: {subjectName}</h1>
       <p>Administra las unidades y ejercicios de tu asignatura.</p>
-
+  
+      {/* BOTÓN FLOTANTE LADO DERECHO */}
+      <button
+        onClick={handleActualizarMasivo}
+        style={{
+          position: "fixed",
+          top: "120px",
+          right: "30px",
+          backgroundColor: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          padding: "10px 14px",
+          cursor: "pointer",
+          fontSize: "0.85rem",
+          zIndex: 1000,
+          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+        }}
+      >
+        Actualizar Progreso
+      </button>
+  
       {/* FORMULARIO DE UNIDAD */}
       <div className="formularios-contenedor">
         <div className="formulario-container">
@@ -83,7 +144,7 @@ const Courses = () => {
           </div>
         </div>
       </div>
-
+  
       {/* LISTADO DE UNIDADES */}
       <div className="listado-container">
         <h2>Listado de Unidades</h2>
@@ -113,7 +174,7 @@ const Courses = () => {
                       ? "Cancelar Crear Ejercicio"
                       : "➕ Crear Ejercicio"}
                   </button>
-
+  
                   {/* FORMULARIO DE EJERCICIO */}
                   {selectedUnitId === unit.id && subjectUnitMap[unit.id] && (
                     <div className="formulario-campos" style={{ marginTop: "1rem" }}>
@@ -131,6 +192,6 @@ const Courses = () => {
       </div>
     </div>
   );
-};
+};  
 
 export default Courses;
