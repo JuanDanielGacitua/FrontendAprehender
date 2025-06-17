@@ -17,6 +17,7 @@ const Courses = () => {
   const [units, setUnits] = useState([]);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [subjectUnitMap, setSubjectUnitMap] = useState({}); // Mapea unitId => subjectUnitId
+  const [showCreateUnit, setShowCreateUnit] = useState(true);
 
   // Obtener unidades por subjectId
   const fetchUnits = useCallback(async () => {
@@ -111,8 +112,30 @@ const Courses = () => {
 
   return (
     <div className="courses-container">
-      <h1 className="courses-title">Asignatura: {subjectName}</h1>
-      <p>Administra las unidades y ejercicios de tu asignatura.</p>
+      <div className="courses-header-block">
+        <h1 className="courses-title-centered">Asignatura: {subjectName}</h1>
+        <p className="courses-subtitle-centered">Administra las unidades y ejercicios de tu asignatura.</p>
+        <div className="formularios-contenedor header-formulario">
+          <div className="formulario-container">
+            <div className="formulario-campos">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <h2 style={{ margin: 0 }}>Crear Nueva Unidad</h2>
+                <button
+                  type="button"
+                  className="toggle-create-unit-btn"
+                  onClick={() => setShowCreateUnit((prev) => !prev)}
+                  aria-label={showCreateUnit ? 'Ocultar formulario' : 'Mostrar formulario'}
+                >
+                  {showCreateUnit ? '▼' : '►'}
+                </button>
+              </div>
+              {showCreateUnit && (
+                <UnitForm subjectId={subjectId} onUnitCreated={handleUnitCreated} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
   
       {/* BOTÓN FLOTANTE LADO DERECHO */}
       <button
@@ -135,56 +158,56 @@ const Courses = () => {
         Actualizar Progreso
       </button>
   
-      {/* FORMULARIO DE UNIDAD */}
-      <div className="formularios-contenedor">
-        <div className="formulario-container">
-          <div className="formulario-campos">
-            <h2>Crear Nueva Unidad</h2>
-            <UnitForm subjectId={subjectId} onUnitCreated={handleUnitCreated} />
-          </div>
-        </div>
-      </div>
-  
       {/* LISTADO DE UNIDADES */}
       <div className="listado-container">
         <h2>Listado de Unidades</h2>
         {units.length === 0 ? (
           <p>No hay unidades registradas.</p>
         ) : (
-          <div className="cards-grid">
+          <div className="units-list">
             {units.map((unit) => (
-              <div key={unit.id} className="teacher-card">
-                <div className="teacher-card-header">
-                  <h3>{unit.title}</h3>
-                </div>
-                <div className="teacher-card-body">
-                  <p>Descripción: {unit.description}</p>
-                  <p>Orden: {unit.order}</p>
-                  <button
-                    className="crear-btn"
-                    onClick={() => {
-                      if (selectedUnitId === unit.id) {
-                        setSelectedUnitId(""); // cerrar
-                      } else {
-                        fetchSubjectUnitId(unit.id); // abrir y buscar subjectUnitId
-                      }
-                    }}
-                  >
-                    {selectedUnitId === unit.id
-                      ? "Cancelar Crear Ejercicio"
-                      : "➕ Crear Ejercicio"}
-                  </button>
-  
-                  {/* FORMULARIO DE EJERCICIO */}
-                  {selectedUnitId === unit.id && subjectUnitMap[unit.id] && (
-                    <div className="formulario-campos" style={{ marginTop: "1rem" }}>
-                      <ExerciseForm
-                        subjectUnitId={subjectUnitMap[unit.id]}
-                        onExerciseCreated={handleExerciseCreated}
-                      />
-                    </div>
+              <div key={unit.id} className="unit-title-row">
+                <button
+                  className={`unit-title-btn${selectedUnitId === unit.id ? ' active' : ''}`}
+                  onClick={() => {
+                    if (selectedUnitId === unit.id) {
+                      setSelectedUnitId(""); // cerrar
+                    } else {
+                      fetchSubjectUnitId(unit.id); // abrir y buscar subjectUnitId
+                    }
+                  }}
+                >
+                  <span>{unit.title}</span>
+                  {selectedUnitId !== unit.id && (
+                    <span className="crear-ejercicio-hint">Crear ejercicio +</span>
                   )}
-                </div>
+                </button>
+                {selectedUnitId === unit.id && (
+                  <div className="teacher-card expanded">
+                    <div className="teacher-card-header">
+                      <h3>{unit.title}</h3>
+                    </div>
+                    <div className="teacher-card-body">
+                      <p>Descripción: {unit.description}</p>
+                      <p>Orden: {unit.order}</p>
+                      <button
+                        className="crear-btn"
+                        onClick={() => setSelectedUnitId("")}
+                      >
+                        Cancelar Crear Ejercicio
+                      </button>
+                      {/* FORMULARIO DE EJERCICIO */}
+                      {subjectUnitMap[unit.id] && (
+                        <div className="formulario-campos" style={{ marginTop: "1rem" }}>
+                          <ExerciseForm
+                            subjectUnitId={subjectUnitMap[unit.id]}
+                            onExerciseCreated={handleExerciseCreated}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
