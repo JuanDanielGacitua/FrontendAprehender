@@ -49,42 +49,44 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="login-left">
-        <img src={sideImage} alt="Decoración visual" />
-      </div>
+    <div className="login-bg">
+      <div className="login-wrapper">
+        <div className="login-left">
+          <img src={sideImage} alt="Decoración visual" />
+        </div>
 
-      <div className="login-right">
-        <form className="login-form" onSubmit={handleSubmit}>
-          <img src={logo} alt="Logo" className="logo" />
-          <h2>Iniciar Sesión</h2>
+        <div className="login-right">
+          <form className="login-form" onSubmit={handleSubmit}>
+            <img src={logo} alt="Logo" className="logo" />
+            <h2>Iniciar Sesión</h2>
 
-          <input
-            type="text"
-            name="username"
-            placeholder="Usuario o Nick"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
+            <input
+              type="text"
+              name="username"
+              placeholder="Usuario o Nick"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+            <input
+              type="password"
+              name="password"
+              placeholder="Contraseña"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
 
-          <button type="submit">Ingresar</button>
+            <button type="submit">Ingresar</button>
 
-          {(error || localError) && (
-            <p className="login-error">
-              {localError || error || "Credenciales inválidas o error de conexión."}
-            </p>
-          )}
-        </form>
+            {(error || localError) && (
+              <p className="login-error">
+                {localError || error || "Credenciales inválidas o error de conexión."}
+              </p>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -15,6 +15,11 @@ const studentService = {
   remove: async (studentId) => {
     const response = await api.delete(`/students/${studentId}`);
     return response.data;
+  },
+
+  getStudentsWithProgress: async () => {
+    const response = await api.get("/students/with-progress");
+    return response.data;
   }
 };
 

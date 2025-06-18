@@ -1,9 +1,21 @@
-/* Fondo azul oscuro */
+/* Fondo azul oscuro solo para login */
+.login-bg {
+    min-height: 100vh;
+    width: 100vw;
+    background-color: #004080;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 body,
 html {
     height: 100%;
     margin: 0;
-    background-color: #004080;
     font-family: 'Segoe UI', sans-serif;
 }
 
