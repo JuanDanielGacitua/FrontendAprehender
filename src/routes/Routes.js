@@ -19,6 +19,7 @@ import Reports from "../pages/Teacher/Reports";
 import Settings from "../pages/Teacher/Settings";
 import Courses from "../pages/Teacher/Courses";
 import PreviewStudent from "../pages/PreviewStudent/PreviewStudent";
+import StudyMaterial from "../pages/Teacher/StudyMaterial";
 
 // Import de páginas UTP
 import UTPHome from "../pages/UTP/Home";
@@ -54,6 +55,7 @@ const AppRoutes = () => {
           <Route path="asistencias" element={<Attendance />} />
           <Route path="reportes" element={<Reports />} />
           <Route path="configuracion" element={<Settings />} />
+          <Route path="materiales" element={<StudyMaterial />} />
         </Route>
 
         {/* Rutas únicamente para UTP */}

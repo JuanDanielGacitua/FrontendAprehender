@@ -72,3 +72,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 # FrontendAprehender
 
 Archivo dedicado a el Front de la APP, la cual será utilizada por Docentes y UTP
+
+### `debes installar npm install xlsx`

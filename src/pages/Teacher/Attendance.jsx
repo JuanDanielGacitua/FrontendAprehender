@@ -22,6 +22,7 @@ function getLast7Days() {
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const user = getUserFromStorage();
   const subjectId = user?.subject?.id;
   const last7Days = getLast7Days();
@@ -39,10 +40,22 @@ const Attendance = () => {
       });
   }, [subjectId]);
 
+  // Filtrar por nombre
+  const filteredData = data.filter(est =>
+    est.nombre.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <h1>Asistencia semanal</h1>
       <p>Visualiza la asistencia y actividad de tus estudiantes en la última semana.</p>
+      <input
+        type="text"
+        placeholder="Buscar estudiante por nombre..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{ marginBottom: 18, padding: 10, borderRadius: 8, border: '1.5px solid #cbd5e1', fontSize: 16, width: 320 }}
+      />
       {loading ? (
         <p>Cargando datos...</p>
       ) : (
@@ -61,7 +74,7 @@ const Attendance = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((est) => {
+            {filteredData.map((est) => {
               // Mapear días a actividad
               let totalLogs = 0;
               let totalMin = 0;
