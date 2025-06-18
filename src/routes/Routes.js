@@ -18,7 +18,6 @@ import Attendance from "../pages/Teacher/Attendance";
 import Reports from "../pages/Teacher/Reports";
 import Settings from "../pages/Teacher/Settings";
 import Courses from "../pages/Teacher/Courses";
-import CourseDetail from "../pages/Teacher/CourseDetail";
 import PreviewStudent from "../pages/PreviewStudent/PreviewStudent";
 
 // Import de páginas UTP
@@ -50,7 +49,6 @@ const AppRoutes = () => {
           <Route index element={<Home />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="cursos" element={<Courses />} />
-          <Route path="courses/:id" element={<CourseDetail />} />
           <Route path="preview-student" element={<PreviewStudent />} />
           <Route path="estudiantes" element={<StudentsDocente />} />
           <Route path="asistencias" element={<Attendance />} />
