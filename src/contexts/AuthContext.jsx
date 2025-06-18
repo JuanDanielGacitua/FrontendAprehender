@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import api from "../services/api";
+import Swal from "sweetalert2";
 
 const AuthContext = createContext();
 
@@ -53,6 +54,17 @@ export const AuthProvider = ({ children }) => {
         navigate("/utp/home");
       } else if (fullUser.role === "TEACHER") {
         navigate("/home");
+      } else if (fullUser.role === "STUDENT") {
+        // Mostrar alerta bonita con SweetAlert2 y esperar interacción
+        await Swal.fire({
+          icon: 'info',
+          title: 'Acceso solo desde la app móvil',
+          text: 'Los estudiantes deben ingresar solo desde la app móvil, no desde la web.',
+          confirmButtonText: 'Entendido',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        });
+        navigate("/login");
       } else {
         navigate("/login");
       }

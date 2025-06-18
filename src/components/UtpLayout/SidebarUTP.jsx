@@ -18,7 +18,6 @@ const SidebarUTP = () => {
           <li><Link to="/utp/courses-subjects">Cursos y Asignaturas</Link></li>
           <li><Link to="/utp/teachers">Docentes</Link></li>
           <li><Link to="/utp/students">Estudiantes</Link></li>
-          <li><Link to="/configuracion">Configuración</Link></li>
         </ul>
       </nav>
       <div className="logout-container">
