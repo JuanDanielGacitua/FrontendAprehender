@@ -218,3 +218,26 @@
 .listado-container .student-card-footer a:hover {
     text-decoration: underline;
 }
+
+.search-container {
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #263545;
+  box-sizing: border-box;
+  color: #263545;
+  background-color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.search-input:focus {
+  border-color: #2c7be5;
+  outline: none;
+  box-shadow: 0 0 5px rgba(44, 123, 229, 0.5);
+}

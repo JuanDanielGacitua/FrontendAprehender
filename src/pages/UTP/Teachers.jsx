@@ -242,8 +242,9 @@ const UTPTeachers = () => {
                   <img src="/avatar.jpeg" alt="Avatar" className="teacher-avatar" />
                   <div className="teacher-card-header-content">
                     <h3>{teacher.name}</h3>
-                    <p>Asignatura: {teacher.subjectId}</p>
-                    <p>Colegio: {teacher.schoolId}</p>
+                    <p>Asignatura: {(
+                      subjects.find((s) => s.id === String(teacher.subjectId))?.name || 'Sin asignatura'
+                    )}</p>
                     <p>Perfil: {teacher.profileType}</p>
                   </div>
                   <img

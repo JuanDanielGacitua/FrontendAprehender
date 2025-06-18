@@ -22,6 +22,7 @@ const UTPStudents = () => {
   });
   const [showForm, setShowForm] = useState(false);
   const [userSchoolId, setUserSchoolId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -34,6 +35,7 @@ const UTPStudents = () => {
         });
 
         const studentsData = await studentService.getAll();
+        console.log('Estudiantes recibidos:', studentsData);
         setStudents(studentsData);
         Swal.close();
       } catch (error) {
@@ -60,7 +62,9 @@ const UTPStudents = () => {
     loadCourses();
 
     const user = getUserFromStorage();
-    if (user) setUserSchoolId(user.schoolId);
+    if (user) {
+      setUserSchoolId(user.schoolId);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -191,32 +195,35 @@ const UTPStudents = () => {
           {showForm && (
             <form onSubmit={handleSubmit}>
               <label>
-                Nombre
+                <span>Nombre</span>
                 <input
                   type="text"
                   name="nombre"
                   value={formData.nombre}
                   onChange={e => setFormData({...formData, nombre: e.target.value})}
+                  required
                 />
               </label>
               <label>
-                Nivel
+                <span>Nivel</span>
                 <input
                   type="number"
                   name="level"
                   value={formData.level}
                   onChange={e => setFormData({...formData, level: parseInt(e.target.value, 10)})}
                   min="1"
+                  required
                 />
               </label>
               <label>
-                Experiencia
+                <span>Experiencia</span>
                 <input
                   type="number"
                   name="experience"
                   value={formData.experience}
                   onChange={e => setFormData({...formData, experience: parseInt(e.target.value, 10)})}
                   min="0"
+                  required
                 />
               </label>
               <label>
@@ -252,31 +259,37 @@ const UTPStudents = () => {
 
       <div className="listado-container">
         <h2>Listado de Estudiantes</h2>
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
         <div className="student-list-section">
           {students.length > 0 ? (
-            students.filter(st => st.id).map(st => (
-              <div key={st.id} className="student-card">
-                <div className="student-card-header">
-                  <img src="/avatar.jpeg" alt="Avatar" className="student-avatar" />
-                  <div className="student-card-header-content">
-                    <h3>{st.nombre}</h3>
-                    <p>Nivel: {st.level}</p>
-                    <p>Experiencia: {st.experience}</p>
+            students
+              .filter((student) =>
+                ((student.nombre || "").toLowerCase().includes(searchTerm.toLowerCase()))
+              )
+              .map((student) => (
+                <div key={student.id} className="student-card">
+                  <div className="student-card-header">
+                    <img src="/avatar.jpeg" alt="Avatar" className="student-avatar" />
+                    <div className="student-card-header-content">
+                      <h3>{student.nombre}</h3>
+                      <p>Nivel: {student.level}</p>
+                      <p>Experiencia: {student.experience}</p>
+                    </div>
                   </div>
-                  <img
-                    src={botonEliminar}
-                    alt="Eliminar"
-                    className="delete-icon"
-                    onClick={() => confirmarEliminacion(st)}
-                    style={{ cursor: "pointer", width: "20px", height: "20px", marginLeft: "10px" }}
-                  />
+                  <div className="student-card-body">
+                    <p>Tareas: Sin tareas asignadas</p>
+                    <p>Evaluaciones: Sin evaluaciones</p>
+                  </div>
                 </div>
-                <div className="student-card-body">
-                  <p>Tareas: Sin tareas asignadas</p>
-                  <p>Evaluaciones: Sin evaluaciones</p>
-                </div>
-              </div>
-            ))
+              ))
           ) : (
             <p>No hay estudiantes registrados.</p>
           )}
