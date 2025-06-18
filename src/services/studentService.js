@@ -20,6 +20,11 @@ const studentService = {
   getStudentsWithProgress: async () => {
     const response = await api.get("/students/with-progress");
     return response.data;
+  },
+
+  getSubjectActivity: async (subjectId) => {
+    const response = await api.get(`/session-logs/subject-activity?subjectId=${subjectId}`);
+    return response.data;
   }
 };
 

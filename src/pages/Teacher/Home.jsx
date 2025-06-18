@@ -7,30 +7,67 @@ import ResumenTabla from "../../components/ResumenTabla";
 import cursoActivoImg from "../../assets/cursoActivo.jpeg";
 import estudianteFondoImg from "../../assets/EstudianteFondo.jpeg";
 import asistenciaFondoImg from "../../assets/AsistenciaFondo.jpeg";
+import { getUserFromStorage } from "../../utils/userUtils";
+import studentService from "../../services/studentService";
 
 const Home = () => {
   const [resumen, setResumen] = useState([]);
   const [students, setStudents] = useState([]);
+  const [lastAttendance, setLastAttendance] = useState({ cantidad: null, fecha: null });
+  const user = getUserFromStorage();
+  const subjectId = user?.subject?.id;
 
   useEffect(() => {
-    fetch("/data/dashboard.json")
+    // Llamada a endpoint real para obtener el resumen de cursos
+    fetch("/api/courses/resumen")
       .then((res) => res.json())
-      .then((data) => setResumen(data.resumenCursos || []));
+      .then((data) => setResumen(data.resumenCursos || []))
+      .catch((error) => console.error("Error al obtener resumen de cursos:", error));
   }, []);
 
   useEffect(() => {
-    fetch("/data/students.json")
-      .then((res) => res.json())
-      .then((data) => setStudents(data || []));
+    // Usar el mismo servicio que Students.jsx para obtener estudiantes con progreso
+    studentService.getStudentsWithProgress()
+      .then((data) => setStudents(data))
+      .catch((error) => console.error("Error al obtener estudiantes:", error));
   }, []);
+
+  useEffect(() => {
+    if (!subjectId) return;
+    studentService.getSubjectActivity(subjectId)
+      .then((res) => {
+        // Buscar la fecha más reciente entre todos los estudiantes
+        let fechas = [];
+        res.forEach(est => {
+          if (Array.isArray(est.dias)) {
+            est.dias.forEach(d => fechas.push(d.fecha));
+          }
+        });
+        if (fechas.length === 0) return;
+        const ultimaFecha = fechas.sort().reverse()[0];
+        // Contar cuántos estudiantes tienen logs en esa fecha
+        let cantidad = 0;
+        res.forEach(est => {
+          const dia = est.dias.find(d => d.fecha === ultimaFecha);
+          if (dia && dia.cantidad > 0) cantidad++;
+        });
+        setLastAttendance({ cantidad, fecha: ultimaFecha });
+      })
+      .catch((error) => console.error("Error al obtener última asistencia:", error));
+  }, [subjectId]);
+
+  // Filtrar estudiantes por subjectId igual que en Students.jsx
+  const filteredStudents = students.filter(est =>
+    Array.isArray(est.subjectId) && est.subjectId.includes(subjectId)
+  );
 
   const totalCursos = resumen.length;
-  const totalEstudiantes = students.length;
+  const totalEstudiantes = filteredStudents.length;
 
   const cards = [
     {
-      title: "Cursos Activos",
-      subtitle: `${totalCursos} cursos asignados`,
+      title: "Asignaturas",
+      subtitle: `1 asignatura asignada`,
       image: cursoActivoImg,
       link: "cursos",
       buttonText: "Ir a Cursos",
@@ -44,7 +81,9 @@ const Home = () => {
     },
     {
       title: "Asistencias",
-      subtitle: "Última sesión: 10 de mayo",
+      subtitle: lastAttendance.cantidad !== null
+        ? `${lastAttendance.cantidad} asistencia${lastAttendance.cantidad === 1 ? '' : 's'}`
+        : "Sin registros recientes",
       image: asistenciaFondoImg,
       link: "asistencias",
       buttonText: "Ir a Asistencias",
