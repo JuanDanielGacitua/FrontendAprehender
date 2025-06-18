@@ -6,6 +6,7 @@ import { getUserFromStorage } from "../../utils/userUtils";
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   const user = getUserFromStorage();
   const subjectId = user?.subject?.id;
@@ -27,17 +28,28 @@ const Students = () => {
     Array.isArray(est.subjectId) && est.subjectId.includes(subjectId)
   );
 
+  // Filtro por nombre
+  const filteredByName = filteredStudents.filter(est =>
+    est.nombre.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <h1>Listado de Estudiantes</h1>
       <p>Estos son los estudiantes registrados en el sistema.</p>
-
+      <input
+        type="text"
+        placeholder="Buscar estudiante por nombre..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{ marginBottom: 18, padding: 10, borderRadius: 8, border: '1.5px solid #cbd5e1', fontSize: 16, width: 320 }}
+      />
       {loading ? (
         <p>Cargando estudiantes...</p>
-      ) : filteredStudents.length === 0 ? (
+      ) : filteredByName.length === 0 ? (
         <p>No hay estudiantes registrados para esta asignatura.</p>
       ) : (
-        <table className="tabla-estudiantes">
+        <table className="tabla-asistencias">
           <thead>
             <tr>
               <th>Estudiante</th>
@@ -50,7 +62,7 @@ const Students = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.map((est) => (
+            {filteredByName.map((est) => (
               <tr key={est.id}>
                 <td>
                   <img

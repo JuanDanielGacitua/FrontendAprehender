@@ -17,7 +17,7 @@ const Courses = () => {
   const [units, setUnits] = useState([]);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [subjectUnitMap, setSubjectUnitMap] = useState({}); // Mapea unitId => subjectUnitId
-  const [showCreateUnit, setShowCreateUnit] = useState(true);
+  const [showCreateUnit, setShowCreateUnit] = useState(false);
 
   // Obtener unidades por subjectId
   const fetchUnits = useCallback(async () => {
