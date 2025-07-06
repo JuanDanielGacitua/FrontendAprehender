@@ -1,6 +1,6 @@
 // src/pages/UTP/Students.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../../styles/UTP/Students.css";
 import logoZorro from "../../assets/logo.png";
 import toggleIcon from "../../assets/toggledown.png";
@@ -9,6 +9,7 @@ import api from "../../services/api";
 import botonEliminar from "../../assets/botonEliminar.png";
 import Swal from "sweetalert2";
 import { getUserFromStorage, getToken } from "../../utils/userUtils";
+import * as XLSX from "xlsx";
 
 const UTPStudents = () => {
   const [students, setStudents] = useState([]);
@@ -23,6 +24,7 @@ const UTPStudents = () => {
   const [showForm, setShowForm] = useState(false);
   const [userSchoolId, setUserSchoolId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -89,8 +91,8 @@ const UTPStudents = () => {
       // 1️⃣ Crear estudiante
       const newStudentResponse = await studentService.create({
         nombre: formData.nombre,
-        level: formData.level,
-        experience: formData.experience,
+        level: 1,
+        experience: 1,
       });
       const newStudent = newStudentResponse.student;
       const studentId = newStudent?.id;
@@ -184,6 +186,136 @@ const UTPStudents = () => {
     }
   };
 
+  const handleDownloadTemplate = () => {
+    // Hoja 1: Estudiantes (solo encabezados y ejemplo, sin password)
+    const wsEstudiantes = XLSX.utils.json_to_sheet([
+      { nombre: "Juan Perez", curso: "Segundo Básico" }
+    ]);
+    // Insertar tabla de cursos a la derecha (columna E en adelante)
+    const cursosData = courses.map(c => [c.name]);
+    // Encabezado de cursos
+    XLSX.utils.sheet_add_aoa(wsEstudiantes, [["Cursos Disponibles"]], { origin: "E1" });
+    // Nombres de cursos debajo del encabezado
+    XLSX.utils.sheet_add_aoa(wsEstudiantes, cursosData, { origin: "E2" });
+
+    // Mejorar estilo: encabezados en negrita y color
+    const setHeaderStyle = (ws, range, bgColor = 'FFC000') => {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cell = ws[XLSX.utils.encode_cell({ r: 0, c: C })];
+        if (cell) {
+          cell.s = {
+            font: { bold: true },
+            fill: { fgColor: { rgb: bgColor } },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            },
+            alignment: { horizontal: "center" }
+          };
+        }
+      }
+    };
+
+    try {
+      setHeaderStyle(wsEstudiantes, XLSX.utils.decode_range(wsEstudiantes['!ref']));
+      // Encabezado de cursos (columna E)
+      const cursosHeaderCell = wsEstudiantes["E1"];
+      if (cursosHeaderCell) {
+        cursosHeaderCell.s = {
+          font: { bold: true },
+          fill: { fgColor: { rgb: '92D050' } },
+          border: {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+          },
+          alignment: { horizontal: "center" }
+        };
+      }
+    } catch (e) { /* Si no soporta estilos, ignorar */ }
+
+    // Ajustar ancho de columnas
+    wsEstudiantes['!cols'] = [
+      { wch: 20 }, // nombre
+      { wch: 25 }, // curso
+      { wch: 2 },  // espacio
+      { wch: 30 }  // cursos disponibles
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, wsEstudiantes, "Estudiantes");
+    XLSX.writeFile(wb, "plantilla_estudiantes.xlsx");
+  };
+
+  // Función para normalizar nombres (sin tildes, espacios extra, minúsculas)
+  function normalizarTexto(texto) {
+    return String(texto)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quitar tildes
+      .replace(/\s+/g, " ") // espacios múltiples a uno
+      .trim()
+      .toLowerCase();
+  }
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      // Validar y limpiar datos
+      const estudiantes = [];
+      const filasInvalidas = [];
+      jsonData.forEach((est, idx) => {
+        // Solo validar filas que tengan nombre y curso
+        if (est.nombre && est.curso) {
+          const nombreCursoExcel = normalizarTexto(est.curso);
+          const cursoEncontrado = courses.find(c => normalizarTexto(c.name) === nombreCursoExcel);
+          if (!cursoEncontrado) {
+            filasInvalidas.push(idx + 2); // +2 porque json_to_sheet ignora encabezado y Excel es 1-indexed
+          }
+          estudiantes.push({
+            nombre: est.nombre,
+            password: "123456",
+            courseId: cursoEncontrado ? cursoEncontrado.id : null,
+            level: 1,
+            experience: 1
+          });
+        }
+      });
+      if (filasInvalidas.length > 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Curso no encontrado",
+          html: `Revisa el nombre del curso en las filas:<br>${filasInvalidas.join(", ")}`
+        });
+        return;
+      }
+      try {
+        Swal.fire({ title: "Cargando estudiantes...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        const token = getToken();
+        await studentService.bulkCreate(estudiantes, token);
+        Swal.close();
+        Swal.fire({ icon: "success", title: "Carga masiva exitosa" });
+        // Recargar estudiantes
+        const studentsData = await studentService.getAll();
+        setStudents(studentsData);
+      } catch (error) {
+        Swal.close();
+        Swal.fire({ icon: "error", title: "Error en la carga masiva", text: error?.response?.data?.message || error.message });
+      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   return (
     <div className="students-page">
       <div className={`formulario-container ${showForm ? "" : "collapsed"}`}>
@@ -201,28 +333,6 @@ const UTPStudents = () => {
                   name="nombre"
                   value={formData.nombre}
                   onChange={e => setFormData({...formData, nombre: e.target.value})}
-                  required
-                />
-              </label>
-              <label>
-                <span>Nivel</span>
-                <input
-                  type="number"
-                  name="level"
-                  value={formData.level}
-                  onChange={e => setFormData({...formData, level: parseInt(e.target.value, 10)})}
-                  min="1"
-                  required
-                />
-              </label>
-              <label>
-                <span>Experiencia</span>
-                <input
-                  type="number"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={e => setFormData({...formData, experience: parseInt(e.target.value, 10)})}
-                  min="0"
                   required
                 />
               </label>
@@ -259,6 +369,16 @@ const UTPStudents = () => {
 
       <div className="listado-container">
         <h2>Listado de Estudiantes</h2>
+        <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
+          <button onClick={handleDownloadTemplate} style={{ padding: 8, borderRadius: 6, background: '#2563eb', color: 'white', border: 'none', fontWeight: 600 }}>Descargar plantilla Excel</button>
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ padding: 8, borderRadius: 6, border: '1.5px solid #cbd5e1' }}
+            ref={fileInputRef}
+          />
+        </div>
         <div className="search-container">
           <input
             type="text"
