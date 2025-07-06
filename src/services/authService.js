@@ -28,9 +28,48 @@ const logout = () => {
   localStorage.removeItem("user");
 };
 
+// Solicitar restablecimiento de contraseña
+const forgotPassword = async (email) => {
+  try {
+    const response = await api.post("/auth/forgot-password", { email });
+    return response.data;
+  } catch (err) {
+    console.error("Error en authService.forgotPassword:", err);
+    throw err;
+  }
+};
+
+// Restablecer contraseña con token
+const resetPassword = async (token, password) => {
+  try {
+    const response = await api.post("/auth/reset-password", { 
+      token, 
+      password 
+    });
+    return response.data;
+  } catch (err) {
+    console.error("Error en authService.resetPassword:", err);
+    throw err;
+  }
+};
+
+// Verificar token de restablecimiento
+const verifyResetToken = async (token) => {
+  try {
+    const response = await api.get(`/auth/verify-reset-token/${token}`);
+    return response.data;
+  } catch (err) {
+    console.error("Error en authService.verifyResetToken:", err);
+    throw err;
+  }
+};
+
 const authService = {
   login,
   logout,
+  forgotPassword,
+  resetPassword,
+  verifyResetToken,
 };
 
 export default authService;

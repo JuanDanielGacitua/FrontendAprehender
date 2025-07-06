@@ -4,6 +4,8 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "../pages/Login";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 import NotFoundPage from "../pages/Teacher/NotFoundPage";
 
 // Import de layouts
@@ -42,6 +44,8 @@ const AppRoutes = () => {
 
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Rutas protegidas (cualquier usuario autenticado) */}
       <Route element={<PrivateRoute />}>
