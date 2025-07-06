@@ -25,6 +25,15 @@ const studentService = {
   getSubjectActivity: async (subjectId) => {
     const response = await api.get(`/session-logs/subject-activity?subjectId=${subjectId}`);
     return response.data;
+  },
+
+  bulkCreate: async (estudiantes, token) => {
+    const response = await api.post(
+      "/students/bulk",
+      { estudiantes },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
   }
 };
 

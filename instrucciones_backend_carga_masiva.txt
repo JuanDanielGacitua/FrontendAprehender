@@ -1,0 +1,60 @@
+INSTRUCCIONES PARA BACKEND: CARGA MASIVA DE ESTUDIANTES
+
+1. ENDPOINT SUGERIDO:
+POST /students/bulk
+
+2. REQUEST BODY (JSON):
+{
+  "estudiantes": [
+    {
+      "nombre": "Juan Perez",
+      "password": "123456",
+      "courseId": "ID_CURSO",
+      "level": 1, // siempre 1
+      "experience": 1 // siempre 1
+    },
+    // ... más estudiantes ...
+  ]
+}
+
+3. FLUJO DE CREACIÓN PARA CADA ESTUDIANTE:
+- Crear el estudiante en la tabla/modelo correspondiente (Student).
+- Crear el usuario asociado (User) con:
+    - username: nombre
+    - email: generar uno único (ej: nombre + timestamp + @zorrecursos.cl)
+    - password: la recibida
+    - schoolId: la del usuario autenticado (extraer del token o request)
+    - role: "STUDENT"
+- Asociar el studentId al usuario creado.
+- Asociar el estudiante al curso indicado (enrollment).
+
+4. VALIDACIONES:
+- Todos los campos requeridos deben estar presentes.
+- Validar que el courseId exista.
+- Validar que el nombre no esté vacío.
+- Validar que la contraseña tenga una longitud mínima segura.
+
+5. RESPUESTA:
+- 200 OK con lista de estudiantes creados y usuarios asociados.
+- Si hay errores en algunos estudiantes, devolver detalles de los errores por cada uno (no abortar toda la carga si hay errores parciales).
+
+6. SEGURIDAD:
+- Solo usuarios autenticados con rol UTP pueden acceder a este endpoint.
+- Validar schoolId del usuario autenticado.
+
+7. EJEMPLO DE RESPUESTA:
+{
+  "success": true,
+  "created": [
+    { "nombre": "Juan Perez", "userId": "...", "studentId": "..." },
+    // ...
+  ],
+  "errors": [
+    { "row": 2, "error": "courseId inválido" }
+  ]
+}
+
+8. NOTAS:
+- Si el curso no existe, devolver error específico para ese estudiante.
+- Si el usuario ya existe, omitir o actualizar según política del sistema.
+- Documentar el endpoint en la API. 
