@@ -1,6 +1,7 @@
 // src/pages/Teacher/Login.jsx
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../styles/Login.css";
 import logo from "../assets/logo.png";
 import sideImage from "../assets/fondoLogin.jpeg";
@@ -85,6 +86,12 @@ const LoginPage = () => {
                 {localError || error || "Credenciales inválidas o error de conexión."}
               </p>
             )}
+
+            <div className="login-links">
+              <Link to="/forgot-password" className="forgot-password-link">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </form>
         </div>
       </div>
