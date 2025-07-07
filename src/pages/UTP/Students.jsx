@@ -25,6 +25,7 @@ const UTPStudents = () => {
   const [userSchoolId, setUserSchoolId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const fileInputRef = useRef(null);
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -262,6 +263,7 @@ const UTPStudents = () => {
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
+    setSelectedFileName(file ? file.name : "");
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async (evt) => {
@@ -301,9 +303,17 @@ const UTPStudents = () => {
       try {
         Swal.fire({ title: "Cargando estudiantes...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const token = getToken();
-        await studentService.bulkCreate(estudiantes, token);
+        const resp = await studentService.bulkCreate(estudiantes, token);
         Swal.close();
-        Swal.fire({ icon: "success", title: "Carga masiva exitosa" });
+        if (resp.errors && resp.errors.length > 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Carga masiva parcial",
+            html: `<b>Algunos estudiantes no se crearon:</b><br><ul style='text-align:left;'>${resp.errors.map(e => `<li>Fila ${e.row}${e.nombre ? ` (${e.nombre})` : ''}: ${e.error}</li>`).join('')}</ul>`
+          });
+        } else {
+          Swal.fire({ icon: "success", title: "Carga masiva exitosa" });
+        }
         // Recargar estudiantes
         const studentsData = await studentService.getAll();
         setStudents(studentsData);
@@ -312,6 +322,7 @@ const UTPStudents = () => {
         Swal.fire({ icon: "error", title: "Error en la carga masiva", text: error?.response?.data?.message || error.message });
       }
       if (fileInputRef.current) fileInputRef.current.value = "";
+      setSelectedFileName("");
     };
     reader.readAsArrayBuffer(file);
   };
@@ -371,13 +382,18 @@ const UTPStudents = () => {
         <h2>Listado de Estudiantes</h2>
         <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
           <button onClick={handleDownloadTemplate} style={{ padding: 8, borderRadius: 6, background: '#2563eb', color: 'white', border: 'none', fontWeight: 600 }}>Descargar plantilla Excel</button>
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleFileUpload}
-            style={{ padding: 8, borderRadius: 6, border: '1.5px solid #cbd5e1' }}
-            ref={fileInputRef}
-          />
+          <label htmlFor="file-upload" style={{ padding: 8, borderRadius: 6, background: '#2563eb', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer', display: 'inline-block' }}>
+            Seleccionar archivo
+            <input
+              id="file-upload"
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+            />
+          </label>
+          {selectedFileName && <span style={{ marginLeft: 8, fontWeight: 500 }}>{selectedFileName}</span>}
         </div>
         <div className="search-container">
           <input
